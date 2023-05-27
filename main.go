@@ -10,11 +10,11 @@ import (
 
 var Tasks []string = []string{"hello, world"}
 
-type Response struct {
-	Data bool `json:"data"`
+type ResponseType struct {
+	Updated bool `json:"updated"`
 }
 
-type NewTask struct {
+type TaskType struct {
 	Task string
 }
 
@@ -27,6 +27,7 @@ func main() {
 
 	app.Use(func(c *fiber.Ctx) error {
 		fmt.Println("Route: ", c.Route().Path)
+		fmt.Println("Method: ", c.Route().Method)
 		return c.Next()
 	})
 
@@ -40,8 +41,6 @@ func main() {
 	})
 
 	app.Post("/task/add", func(c *fiber.Ctx) error {
-		// Tasks = append(Tasks, )
-
 		payload := struct {
 			Task string `json:"task"`
 		}{}
@@ -55,7 +54,7 @@ func main() {
 		Tasks = append(Tasks, payload.Task)
 
 		fmt.Println(payload.Task)
-		return c.JSON(&Response{Data: true})
+		return c.JSON(&ResponseType{Updated: true})
 	})
 
 	log.Fatal(app.Listen(":8000"))
