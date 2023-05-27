@@ -10,6 +10,14 @@ import (
 
 var Tasks []string = []string{"hello, world"}
 
+type Response struct {
+	Data bool `json:"data"`
+}
+
+type NewTask struct {
+	Task string
+}
+
 func main() {
 	app := fiber.New()
 
@@ -29,6 +37,25 @@ func main() {
 	app.Get("/tasks", func(c *fiber.Ctx) error {
 		fmt.Printf("Tasks: %v\n", Tasks)
 		return c.JSON(&Tasks)
+	})
+
+	app.Post("/task/add", func(c *fiber.Ctx) error {
+		// Tasks = append(Tasks, )
+
+		payload := struct {
+			Task string `json:"task"`
+		}{}
+
+		err := c.BodyParser(&payload)
+
+		if err != nil {
+			return c.SendStatus(400)
+		}
+
+		Tasks = append(Tasks, payload.Task)
+
+		fmt.Println(payload.Task)
+		return c.JSON(&Response{Data: true})
 	})
 
 	log.Fatal(app.Listen(":8000"))
