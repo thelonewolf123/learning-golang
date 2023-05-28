@@ -1,3 +1,10 @@
 .flex {
     display: flex;
 }
+
+.list-item {
+    flex-direction: row;
+    width: 200px;
+    justify-content: space-between;
+    padding: 2px;
+}

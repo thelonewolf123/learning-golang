@@ -67,9 +67,12 @@ func main() {
 
 		fmt.Println("index => ", index)
 
+		TasksCopy := make([]string, len(Tasks))
+		copy(TasksCopy, Tasks)
+
 		Tasks = make([]string, 0)
 
-		for i, v := range Tasks {
+		for i, v := range TasksCopy {
 			if index == i {
 				continue
 			}

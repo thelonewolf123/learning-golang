@@ -12,6 +12,18 @@ function App() {
             })
     }, [])
 
+    const deleteTask = useCallback(
+        (idx: number) => {
+            fetch(`http://localhost:8000/task/${idx}`, { method: 'DELETE' })
+                .then((r) => r.json())
+                .then((x) => {
+                    console.log(x)
+                    fetchTasks()
+                })
+        },
+        [fetchTasks]
+    )
+
     useEffect(() => {
         fetchTasks()
     }, [fetchTasks])
@@ -24,8 +36,10 @@ function App() {
                     placeholder="task"
                     onChange={(e) => setTask(e.target.value)}
                     value={task}
+                    data-id={'task-input'}
                 ></input>
                 <button
+                    type="button"
                     onClick={() => {
                         fetch('http://localhost:8000/task/add', {
                             method: 'POST',
@@ -46,8 +60,23 @@ function App() {
                 </button>
             </div>
             <ul>
-                {tasks.map((z) => {
-                    return <li>{z}</li>
+                {tasks.map((z, idx) => {
+                    return (
+                        <li data-id={z}>
+                            <div className="flex list-item">
+                                <span> {z}</span>
+                                <button
+                                    type="button"
+                                    data-id={'delete-button'}
+                                    onClick={() => {
+                                        deleteTask(idx)
+                                    }}
+                                >
+                                    delete
+                                </button>
+                            </div>
+                        </li>
+                    )
                 })}
             </ul>
         </>
