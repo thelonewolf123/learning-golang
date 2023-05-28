@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -14,8 +15,8 @@ type ResponseType struct {
 	Updated bool `json:"updated"`
 }
 
-type TaskType struct {
-	Task string
+type DeleteTaskType struct {
+	Index string `json:"index"`
 }
 
 func main() {
@@ -54,6 +55,27 @@ func main() {
 		Tasks = append(Tasks, payload.Task)
 
 		fmt.Println(payload.Task)
+		return c.JSON(&ResponseType{Updated: true})
+	})
+
+	app.Delete("/task/:id", func(c *fiber.Ctx) error {
+		fmt.Printf("params: %T\n", c.Params("id"))
+		index, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return c.SendStatus(400)
+		}
+
+		fmt.Println("index => ", index)
+
+		Tasks = make([]string, 0)
+
+		for i, v := range Tasks {
+			if index == i {
+				continue
+			}
+			Tasks = append(Tasks, v)
+		}
+
 		return c.JSON(&ResponseType{Updated: true})
 	})
 
