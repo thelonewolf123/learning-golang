@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 function App() {
     const [task, setTask] = useState('')
-    const [tasks, setTasks] = useState<string[]>([])
+    const [tasks, setTasks] = useState<{ task: string }[]>([])
 
     const fetchTasks = useCallback(() => {
         fetch('http://localhost:8000/tasks')
@@ -62,9 +62,9 @@ function App() {
             <ul>
                 {tasks.map((z, idx) => {
                     return (
-                        <li data-id={z}>
+                        <li data-id={z.task}>
                             <div className="flex list-item">
-                                <span> {z}</span>
+                                <span> {z.task}</span>
                                 <button
                                     type="button"
                                     data-id={'delete-button'}

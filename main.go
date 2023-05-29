@@ -7,6 +7,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 var Tasks []string = []string{"hello, world"}
@@ -20,11 +22,49 @@ type DeleteTaskType struct {
 }
 
 type Todo struct {
+	gorm.Model
 	Task string `json:"task"`
+}
+
+func InitDatabase() {
+	db, err := gorm.Open(sqlite.Open("todo.db"), &gorm.Config{})
+	if err != nil {
+		log.Fatal("Log initialize failed!")
+	}
+
+	db.AutoMigrate(&Todo{})
+}
+
+func addTodoTask(task string) error {
+	db, err := gorm.Open(sqlite.Open("todo.db"), &gorm.Config{})
+
+	if err != nil {
+		return err
+	}
+
+	db.Create(&Todo{Task: task})
+	return nil
+}
+
+func GetAllTodo() ([]Todo, error) {
+	var todos []Todo
+
+	db, err := gorm.Open(sqlite.Open("todo.db"), &gorm.Config{})
+
+	if err != nil {
+		return nil, err
+	}
+
+	db.Find(&todos)
+
+	return todos, nil
+
 }
 
 func main() {
 	app := fiber.New()
+
+	InitDatabase()
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
@@ -42,7 +82,11 @@ func main() {
 
 	app.Get("/tasks", func(c *fiber.Ctx) error {
 		fmt.Printf("Tasks: %v\n", Tasks)
-		return c.JSON(&Tasks)
+		todos, err := GetAllTodo()
+		if err != nil {
+			return c.Status(500).SendString("Server side error, please contact support!")
+		}
+		return c.JSON(&todos)
 	})
 
 	app.Post("/task/add", func(c *fiber.Ctx) error {
@@ -57,6 +101,8 @@ func main() {
 		}
 
 		Tasks = append(Tasks, payload.Task)
+
+		addTodoTask(payload.Task)
 
 		fmt.Println(payload.Task)
 		return c.JSON(&ResponseType{Updated: true})
