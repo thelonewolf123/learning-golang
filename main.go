@@ -17,12 +17,8 @@ type ResponseType struct {
 	Updated bool `json:"updated"`
 }
 
-type DeleteTaskType struct {
-	Index string `json:"index"`
-}
-
 type Todo struct {
-	gorm.Model
+	ID   uint   `gorm:"primaryKey"`
 	Task string `json:"task"`
 }
 
