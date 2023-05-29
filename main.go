@@ -19,6 +19,10 @@ type DeleteTaskType struct {
 	Index string `json:"index"`
 }
 
+type Todo struct {
+	Task string `json:"task"`
+}
+
 func main() {
 	app := fiber.New()
 
