@@ -22,15 +22,6 @@ type Todo struct {
 	Task string `json:"task"`
 }
 
-func InitDatabase() {
-	db, err := gorm.Open(sqlite.Open("todo.db"), &gorm.Config{})
-	if err != nil {
-		log.Fatal("Log initialize failed!")
-	}
-
-	db.AutoMigrate(&Todo{})
-}
-
 func addTodoTask(task string) error {
 	db, err := gorm.Open(sqlite.Open("todo.db"), &gorm.Config{})
 
@@ -42,25 +33,11 @@ func addTodoTask(task string) error {
 	return nil
 }
 
-func GetAllTodo() ([]Todo, error) {
-	var todos []Todo
-
-	db, err := gorm.Open(sqlite.Open("todo.db"), &gorm.Config{})
-
-	if err != nil {
-		return nil, err
-	}
-
-	db.Find(&todos)
-
-	return todos, nil
-
-}
-
 func main() {
 	app := fiber.New()
 
-	InitDatabase()
+	db := SqliteDb{}
+	db.InitializeDatabase()
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
@@ -78,7 +55,7 @@ func main() {
 
 	app.Get("/tasks", func(c *fiber.Ctx) error {
 		fmt.Printf("Tasks: %v\n", Tasks)
-		todos, err := GetAllTodo()
+		todos, err := db.GetAllTodo()
 		if err != nil {
 			return c.Status(500).SendString("Server side error, please contact support!")
 		}
