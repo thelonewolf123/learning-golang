@@ -25,3 +25,10 @@ func (ctx *SqliteDb) GetAllTodo() ([]Todo, error) {
 	ctx.db.Find(&todos)
 	return todos, nil
 }
+
+func (ctx *SqliteDb) AddTodoTask(task string) error {
+	if result := ctx.db.Create(&Todo{Task: task}); result.Error != nil {
+		return result.Error
+	}
+	return nil
+}

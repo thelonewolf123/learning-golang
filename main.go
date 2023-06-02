@@ -7,8 +7,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
 
 var Tasks []string = []string{"hello, world"}
@@ -20,17 +18,6 @@ type ResponseType struct {
 type Todo struct {
 	ID   uint   `gorm:"primaryKey"`
 	Task string `json:"task"`
-}
-
-func addTodoTask(task string) error {
-	db, err := gorm.Open(sqlite.Open("todo.db"), &gorm.Config{})
-
-	if err != nil {
-		return err
-	}
-
-	db.Create(&Todo{Task: task})
-	return nil
 }
 
 func main() {
@@ -74,8 +61,9 @@ func main() {
 		}
 
 		Tasks = append(Tasks, payload.Task)
-
-		addTodoTask(payload.Task)
+		if err := db.AddTodoTask(payload.Task); err != nil {
+			return c.SendStatus(503)
+		}
 
 		fmt.Println(payload.Task)
 		return c.JSON(&ResponseType{Updated: true})
