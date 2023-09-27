@@ -17,7 +17,6 @@ function App() {
             fetch(`http://localhost:8000/task/${idx}`, { method: 'DELETE' })
                 .then((r) => r.json())
                 .then((x) => {
-                    console.log(x)
                     fetchTasks()
                 })
         },
